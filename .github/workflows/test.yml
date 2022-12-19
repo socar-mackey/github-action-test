@@ -10,6 +10,6 @@ jobs:
     steps:
       - name: Hello world action step
         id: hello
-        uses: socar-mackey/action-a@1.0
+        uses: socar-mackey/action-a@1.0.0
         with:
           who-to-greet: 'Mackey'
