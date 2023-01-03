@@ -1,15 +1,69 @@
-name: Testtest
+# Workflow: Release Candidate 를 배포합니다.
+name: Deploy Project
 
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: "앱 타겟 (Socar/PairingOwner)"
+        required: true
+        default: "Socar"
+        
+      version:
+        description: "앱 버전 (Major.Minor.Patch)"
+        required: true
+        default: "1.0.0"
+        
+      build:
+        description: "빌드 번호"
+        required: true
+        default: "1234"        
+
+      git:
+        description: "변경 사항 push 여부"
+        required: false
+        default: "true"
+      
+      appstore:
+        description: "앱스토어 업로드"
+        required: true
+        default: "true"
+
+# 환경변수 설정
+env:
+  TARGET: ${{ github.event.inputs.target }}
+  VERSION: ${{ github.event.inputs.version }}
+  BUILD: ${{ github.event.inputs.build }}
+  GIT: ${{ github.event.inputs.git }}
+  APPSTORE: ${{ github.event.inputs.appstore }}
 
 jobs:
-  jobjob:
+  # 배포
+  deploy:
     runs-on: self-hosted
     
     steps:
-      - name: Hello world action step
-        id: hello
-        uses: socar-mackey/action-a@1.0.0
-        with:
-          who-to-greet: 'Mackey'
+      - name: Checkout
+        run: echo good
+        
+      - name: Fastlane Deploy
+        run: |
+          echo good2
+
+      - name: Git push
+        if: ${{ env.GIT == 'true' }}
+        run: |
+          echo good3
+          exit 1
+
+  # 앱스토어 업로드
+  deliver:
+    if: ${{ success() }}
+    needs: deploy
+    runs-on: self-hosted
+    
+    steps:
+      - name: Upload To App Store
+        if: ${{ env.APPSTORE == 'true' }}
+        run: |
+          fastlane upload_build
