@@ -56,6 +56,7 @@ jobs:
       # 배포 변경사항 깃 푸시
       - name: Git push
         if: ${{ env.GIT == 'true' && steps.deployAdhoc.conclusion == 'success' }}
+        continue-on-error: true
         run: |
           echo good3
           exit 1
