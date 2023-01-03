@@ -1,4 +1,3 @@
-# Workflow: Release Candidate 를 배포합니다.
 name: Deploy Project
 
 on:
@@ -43,27 +42,26 @@ jobs:
     runs-on: self-hosted
     
     steps:
+      # 배포 브랜치 체크아웃
       - name: Checkout
-        run: echo good
+        run: |
+          echo good1
         
       - name: Fastlane Deploy
+        id: deployAdhoc
+        if: ${{ success() }}
         run: |
           echo good2
-
+          
+      # 배포 변경사항 깃 푸시
       - name: Git push
-        if: ${{ env.GIT == 'true' }}
+        if: ${{ env.GIT == 'true' && steps.deployAdhoc.conclusion == 'success' }}
         run: |
           echo good3
           exit 1
-
-  # 앱스토어 업로드
-  deliver:
-    if: ${{ success() }}
-    needs: deploy
-    runs-on: self-hosted
-    
-    steps:
-      - name: Upload To App Store
-        if: ${{ env.APPSTORE == 'true' }}
+          
+      # 릴리즈 빌드 앱스토어 배포
+      - name: Appstore Deploy
+        if: ${{ env.APPSTORE == 'true' && steps.deployAdhoc.conclusion == 'success' }}
         run: |
           echo good4
